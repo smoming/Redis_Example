@@ -23,6 +23,7 @@
 *.project
 .settings/
 */target/
+target/
 *.classpath
 
 
