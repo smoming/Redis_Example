@@ -1,7 +1,9 @@
 package per.mike.example.ctrl;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -63,5 +65,81 @@ public class ProductController {
         redisTemplate.delete(id);
 
         return "delete product success ~";
+    }
+
+    @GetMapping("/fetchForList")
+    public List<ProductData> fetchForList() {
+        Long size = redisTemplate.opsForList().size(HASH_KEY);
+        return redisTemplate.opsForList().range(HASH_KEY, 0, size - 1);
+    }
+
+    @GetMapping("/rightPushForList")
+    public Long rightPushForList() {
+        return redisTemplate.opsForList()
+                .rightPush(HASH_KEY, new ProductData("1", "水", new BigDecimal(10)));
+    }
+
+    @GetMapping("/leftPopForList")
+    public ProductData leftPopForList() {
+        return redisTemplate.opsForList()
+                .leftPop(HASH_KEY);
+    }
+
+    @GetMapping("/delForList")
+    public Boolean delForList() {
+        return redisTemplate.delete(HASH_KEY);
+    }
+
+    @GetMapping("/fetchForHash")
+    public Map<Object, Object> fetchForHash() {
+        return redisTemplate.opsForHash().entries(HASH_KEY);
+    }
+
+    @GetMapping("/fetchForHashByKey")
+    public Object fetchForHashByKey(String key) {
+        return redisTemplate.opsForHash().entries(HASH_KEY).get(key);
+    }
+
+    @GetMapping("/putForHash")
+    public String putForHash() {
+        List<ProductData> list1 = Arrays.asList(
+                new ProductData("1", "水1", new BigDecimal(10)),
+                new ProductData("2", "水2", new BigDecimal(11)),
+                new ProductData("3", "水3", new BigDecimal(12)));
+        
+        List<ProductData> list2 = Arrays.asList(
+                new ProductData("1", "可樂1", new BigDecimal(110)),
+                new ProductData("2", "可樂2", new BigDecimal(111)),
+                new ProductData("3", "可樂3", new BigDecimal(112)));
+
+        redisTemplate.opsForHash().put(HASH_KEY, "list1", list1);
+        redisTemplate.opsForHash().put(HASH_KEY, "list2", list2);
+
+        return "putForHash Success ~";
+    }
+
+    @GetMapping("/putForHashDoUpd")
+    public String putForHashDoUpd(String key) {
+        
+        List<ProductData> list2 = Arrays.asList(
+                new ProductData("11", "西瓜1", new BigDecimal(1101)),
+                new ProductData("22", "西瓜2", new BigDecimal(1111)),
+                new ProductData("33", "西瓜3", new BigDecimal(1121)));
+        
+        redisTemplate.opsForHash().put(HASH_KEY, key, list2);
+
+        return "putForHash Do Upd Success ~";
+    }
+
+    @GetMapping("/delForHashByKey")
+    public String delForHashByKey(String key) {
+        redisTemplate.opsForHash().delete(HASH_KEY, key);
+        return "delForHashByKey Success ~";
+    }
+
+    @GetMapping("/delForHash")
+    public String delForHash() {
+        redisTemplate.delete(HASH_KEY);
+        return "delForHash Success ~";
     }
 }
