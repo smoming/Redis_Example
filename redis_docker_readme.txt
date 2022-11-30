@@ -1,1 +1,1 @@
-docker run -p 7001:6379 --name redis-server -d redis --requirepass "root"
+docker run -p 6379:6379 --name redis-server -d redis --requirepass "root"
